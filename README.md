@@ -1,1 +1,4 @@
-# blockchain_challenge_01
+# Blockchain Challenge 01
+
+Anomalous mnemonics
+
