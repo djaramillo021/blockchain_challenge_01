@@ -1,3 +1,4 @@
+#include <iostream>
 #include <bitcoin/bitcoin.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
@@ -8,7 +9,7 @@ using namespace bc;
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std:cerr << "Syntax: wallet-get <net>" << std::endl;
+        std::cerr << "Syntax: wallet-get <net>" << std::endl;
         return -1;
     }
     const char* net = argv[1];
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]) {
     std::string input_words;
 
     std::cout << "Enter mnemonic (empty to autogenerate): ";
-    std::getline(cin, input_words);
+    std::getline(std::cin, input_words);
     if (input_words == "") {
         data_chunk my_entropy(32);
         pseudo_random_fill(my_entropy);
@@ -47,11 +48,20 @@ int main(int argc, char* argv[]) {
     auto hd_seed = wallet::decode_mnemonic(mnemonic_words);
     data_chunk seed_chunk(to_chunk(hd_seed));
 
-    auto m = wallet::hd_private(seed_chunk, net_prefixes);
-    auto m_purpose = m.derive_private(wallet::hd_first_hardened_key + BIP_NUMBER);
-    auto m_coin = m_purpose.derive_private(wallet::hd_first_hardened_key + coin_bip44_id);
-    auto m_account = m_coin.derive_private(wallet::hd_first_hardened_key + 0);
-    auto m_ext = m_account.derive_private(0);
+    std::cout << "\nHex Seed: " << std::endl;
+    std::cout << encode_base16(seed_chunk)<< std::endl;
+
+ 
+    wallet::hd_private m = wallet::hd_private(seed_chunk, net_prefixes);
+    
+
+    wallet::hd_private m_purpose = m.derive_private(wallet::hd_first_hardened_key + BIP_NUMBER);
+    wallet::hd_private m_coin = m_purpose.derive_private(wallet::hd_first_hardened_key + coin_bip44_id);
+
+
+
+    wallet::hd_private m_account = m_coin.derive_private(wallet::hd_first_hardened_key + 0);
+    wallet::hd_private m_ext = m_account.derive_private(0);
 
     std::cout << std::endl;
     std::cout << "Account extended PrvKey: " << m_account << std::endl;
@@ -62,7 +72,7 @@ int main(int argc, char* argv[]) {
     std::cout << std::endl;
 
     for (int i = 0; i < 20; i++) {
-        auto mi = m_ext.derive_private(i);
+        wallet::hd_private mi = m_ext.derive_private(i);
         auto Mi = mi.to_public();
 
         auto pv_key = wallet::ec_private(

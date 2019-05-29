@@ -25,10 +25,10 @@ rl.on('line', function(words) {
     }
 
     const m = code.toHDPrivateKey(); // empty passphrase
-    const mPurpose = m.derive(BIP_NUMBER, true); // 44'
-    const mCoin = mPurpose.derive(coin_bip44_id, true);
-    const mAccount = mCoin.derive(0, true);
-    const mExt = mAccount.derive(0);
+    const mPurpose = m._deriveWithNumber(BIP_NUMBER, true,false); // 44'
+    const mCoin = mPurpose._deriveWithNumber(coin_bip44_id, true,false);
+    const mAccount = mCoin._deriveWithNumber(0, true,false);
+    const mExt = mAccount._deriveWithNumber(0,false,false);
 
     console.log();
     console.log(`Account extended PrvKey: ${mAccount}`);
@@ -39,7 +39,7 @@ rl.on('line', function(words) {
     console.log();
 
     for (var i = 0; i < 20; i++) {
-        var myPath = mExt.derive(i)
+        var myPath = mExt._deriveWithNumber(i,false,false)
         var privKey = myPath.privateKey;
         var address = privKey.toAddress();
 

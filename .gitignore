@@ -63,3 +63,7 @@ typings/
 .vscode
 bip44-quick-gen
 package*.json
+
+
+*.o
+prog
